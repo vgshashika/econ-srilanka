@@ -1,93 +1,99 @@
 "use client";
-// ─── Navbar Component ─────────────────────────────────────────────────────────
-// Full-width dark navigation bar with:
-//   • "All Categories" dropdown trigger (orange, left-most)
-//   • Primary nav links
-//   • Right-side quick access links
+// ─── Navbar Component (Milestone 02 redesign) ─────────────────────────────────
+// Reference: Made-in-China.com top nav
+// White background · left: All Categories · center: main links · right: role dropdowns
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState } from "react";
 import Link from "next/link";
+import MegaMenu from "./MegaMenu";
 
-const NAV_ITEMS = [
-  { label: "Home",        href: "/" },
-  { label: "Products",    href: "/products" },
-  { label: "Suppliers",   href: "/suppliers" },
-  { label: "Buyers",      href: "/buyers" },
-  { label: "Trade Shows", href: "/trade-shows" },
-  { label: "Industries",  href: "/industries" },
-  { label: "Help",        href: "/help" },
+const CENTER_LINKS = [
+  { label: "AI Sourcing",       href: "/ai-sourcing",     hot: true  },
+  { label: "Trade Assurance",   href: "/trade-assurance", hot: false },
+  { label: "Video Channel",     href: "/videos",          hot: false },
+  { label: "Top-ranked Exports",href: "/top-ranked",      hot: false },
 ];
 
-// Hamburger / menu icon
-function MenuIcon() {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none"
-      viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-    </svg>
-  );
-}
+const RIGHT_DROPDOWNS = ["Supplier","Buyer","Help","Apps","English"];
 
-// Chevron down
-function ChevronDown() {
+function ChevronDown({ open }) {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 ml-1" fill="none"
-      viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+    <svg xmlns="http://www.w3.org/2000/svg"
+      className={`h-3 w-3 ml-0.5 transition-transform ${open ? "rotate-180" : ""}`}
+      fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7"/>
     </svg>
   );
 }
 
 export default function Navbar() {
-  const [active, setActive] = useState("Home");
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [active,   setActive]   = useState("");
 
   return (
-    <nav className="bg-[#0C1E35] text-white border-t border-white/5">
+    <nav className="bg-white border-b border-gray-200 relative z-40">
       <div className="max-w-[1280px] mx-auto px-4">
-        <div className="flex items-center">
+        <div className="flex items-center h-11">
 
-          {/* ── All Categories button (orange pill, left anchor) ── */}
-          <button
-            className="flex items-center gap-2 bg-[#E8820C] hover:bg-[#d4740a]
-                       px-4 py-3 text-sm font-semibold transition-colors flex-shrink-0">
-            <MenuIcon />
-            <span>All Categories</span>
-            <ChevronDown />
-          </button>
+          {/* ── All Categories trigger ── */}
+          <div
+            className="relative flex-shrink-0 h-full flex items-center"
+            onMouseEnter={() => setMenuOpen(true)}
+            onMouseLeave={() => setMenuOpen(false)}
+          >
+            <button
+              className={`flex items-center gap-1.5 h-full px-4 text-sm font-semibold
+                          transition-colors border-r border-gray-200
+                          ${menuOpen
+                            ? "bg-[#E8820C] text-white"
+                            : "text-gray-800 hover:bg-gray-50"}`}>
+              {/* hamburger */}
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+              <span>All Categories</span>
+              <ChevronDown open={menuOpen}/>
+            </button>
 
-          {/* ── Primary navigation links ── */}
-          <div className="flex items-center ml-2">
-            {NAV_ITEMS.map(({ label, href }) => (
+            {menuOpen && <MegaMenu />}
+          </div>
+
+          {/* ── Center links ── */}
+          <div className="flex items-center h-full ml-1">
+            {CENTER_LINKS.map(({ label, href, hot }) => (
               <Link key={label} href={href}
                 onClick={() => setActive(label)}
-                className={[
-                  "px-4 py-3 text-sm font-medium transition-colors relative whitespace-nowrap",
-                  "hover:bg-white/10 hover:text-white",
-                  active === label
-                    ? "text-white after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#E8820C]"
-                    : "text-white/70",
-                ].join(" ")}>
+                className={`relative h-full flex items-center px-4 text-sm
+                            transition-colors whitespace-nowrap
+                            ${active === label
+                              ? "text-[#E8820C] font-semibold after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-[#E8820C]"
+                              : "text-gray-700 hover:text-[#E8820C]"}`}>
                 {label}
+                {hot && (
+                  <span className="ml-1.5 bg-red-500 text-white text-[9px] font-bold
+                                   px-1.5 py-0.5 rounded-full uppercase tracking-wide">
+                    AI
+                  </span>
+                )}
               </Link>
             ))}
           </div>
 
-          {/* ── Right-side quick access ── */}
-          <div className="ml-auto flex items-center gap-5 text-sm text-white/60">
-            <Link href="#" className="flex items-center gap-1.5 hover:text-[#E8820C] transition-colors">
-              <span className="text-base">🔥</span>
-              <span>Hot Deals</span>
-            </Link>
-            <Link href="#" className="flex items-center gap-1.5 hover:text-[#E8820C] transition-colors">
-              <span className="text-base">✅</span>
-              <span>Verified Suppliers</span>
-            </Link>
-            <Link href="#" className="flex items-center gap-1.5 hover:text-[#E8820C] transition-colors">
-              <span className="text-base">🚢</span>
-              <span>Export Guide</span>
-            </Link>
+          {/* ── Right dropdowns ── */}
+          <div className="ml-auto flex items-center h-full">
+            {RIGHT_DROPDOWNS.map(label => (
+              <button key={label}
+                className="flex items-center gap-0.5 h-full px-3 text-[13px]
+                           text-gray-600 hover:text-[#E8820C] transition-colors
+                           whitespace-nowrap border-l border-gray-100 first:border-0">
+                {label}
+                <ChevronDown open={false}/>
+              </button>
+            ))}
           </div>
+
         </div>
       </div>
     </nav>

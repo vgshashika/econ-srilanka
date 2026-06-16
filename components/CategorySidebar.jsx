@@ -1,82 +1,71 @@
 "use client";
-// ─── CategorySidebar Component ────────────────────────────────────────────────
-// A fixed-width vertical sidebar listing all major product categories.
-// Hovering a row highlights it and reveals the ">" chevron.
+// ─── CategorySidebar Component (Milestone 02 redesign) ────────────────────────
+// Reference: Made-in-China.com left sidebar
+// Text-only category list · "≡ Categories" header · "More Categories >" footer
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState } from "react";
 
 const CATEGORIES = [
-  { emoji: "💎", label: "Gems & Jewelry",         count: 1_240 },
-  { emoji: "🫖", label: "Ceylon Tea",               count: 980  },
-  { emoji: "👗", label: "Apparel & Textiles",       count: 2_100 },
-  { emoji: "🌿", label: "Spices & Agriculture",     count: 1_640 },
-  { emoji: "🏺", label: "Handicrafts & Arts",       count: 540  },
-  { emoji: "🥥", label: "Coconut Products",         count: 720  },
-  { emoji: "🪵", label: "Wood & Furniture",         count: 430  },
-  { emoji: "🐟", label: "Seafood & Marine",         count: 320  },
-  { emoji: "🧴", label: "Beauty & Personal Care",   count: 670  },
-  { emoji: "🏗️", label: "Building & Construction",  count: 890  },
-  { emoji: "⚙️", label: "Industrial Machinery",    count: 350  },
-  { emoji: "🎁", label: "Gifts & Novelties",        count: 480  },
+  "Gems & Jewelry",
+  "Ceylon Tea & Beverages",
+  "Apparel & Textiles",
+  "Spices & Agriculture",
+  "Handicrafts & Arts",
+  "Coconut Products",
+  "Wood & Furniture",
+  "Seafood & Marine",
+  "Beauty & Personal Care",
+  "Building & Construction",
+  "Industrial Machinery",
+  "Gifts & Novelties",
+  "Electronics & Tech",
+  "Packaging & Printing",
+  "Health & Ayurveda",
 ];
 
 export default function CategorySidebar() {
   const [hovered, setHovered] = useState(null);
+  const [showAll, setShowAll] = useState(false);
+
+  const visible = showAll ? CATEGORIES : CATEGORIES.slice(0, 13);
 
   return (
-    /* Sidebar: 210px wide, same height as the hero banner */
-    <aside className="w-[210px] flex-shrink-0 bg-white border border-gray-200
-                      rounded-xl shadow-sm overflow-hidden flex flex-col">
+    <aside className="w-[240px] flex-shrink-0 bg-white border border-gray-200">
 
-      {/* Header strip */}
-      <div className="bg-[#1E3A5F] text-white text-[13px] font-semibold
-                      px-4 py-2.5 flex-shrink-0 tracking-wide">
-        Product Categories
+      {/* Header */}
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-gray-200">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-700" fill="none"
+          viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+        <span className="font-bold text-[15px] text-gray-800">Categories</span>
       </div>
 
       {/* Category list */}
-      <ul className="flex-1 overflow-y-auto divide-y divide-gray-100/80">
-        {CATEGORIES.map(({ emoji, label, count }, i) => (
+      <ul>
+        {visible.map((label, i) => (
           <li key={i}>
             <button
               onMouseEnter={() => setHovered(i)}
               onMouseLeave={() => setHovered(null)}
-              className={[
-                "w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors",
-                hovered === i
-                  ? "bg-orange-50 border-l-2 border-[#E8820C]"
-                  : "border-l-2 border-transparent",
-              ].join(" ")}>
-
-              {/* Emoji icon */}
-              <span className="text-[18px] flex-shrink-0 w-6 text-center">{emoji}</span>
-
-              {/* Label + count */}
-              <div className="flex-1 min-w-0">
-                <div className="text-[12px] font-medium text-gray-800 truncate leading-tight">
-                  {label}
-                </div>
-                <div className="text-[10px] text-gray-400 mt-0.5">
-                  {count.toLocaleString()} products
-                </div>
-              </div>
-
-              {/* Chevron – visible on hover */}
-              <span className={[
-                "text-[#E8820C] text-xs font-bold transition-opacity",
-                hovered === i ? "opacity-100" : "opacity-0",
-              ].join(" ")}>›</span>
+              className={`w-full text-left px-4 py-2 text-[13px] transition-colors
+                          ${hovered === i
+                            ? "bg-orange-50 text-[#E8820C]"
+                            : "text-gray-600 hover:text-[#E8820C]"}`}>
+              {label}
             </button>
           </li>
         ))}
       </ul>
 
-      {/* Footer: View All */}
-      <div className="border-t border-gray-100 px-3 py-2.5 flex-shrink-0 bg-gray-50">
-        <button className="w-full text-center text-[12px] text-[#E8820C]
-                           hover:text-[#d4740a] font-semibold transition-colors">
-          View All Categories →
+      {/* More / Less toggle */}
+      <div className="px-4 py-2.5 border-t border-gray-100">
+        <button
+          onClick={() => setShowAll(s => !s)}
+          className="text-[13px] text-[#0066CC] hover:text-[#E8820C]
+                     font-medium transition-colors flex items-center gap-1">
+          {showAll ? "Less Categories ∧" : "More Categories >"}
         </button>
       </div>
     </aside>
