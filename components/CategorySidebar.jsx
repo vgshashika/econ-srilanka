@@ -5,23 +5,24 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState } from "react";
+import Link from "next/link";
 
 const CATEGORIES = [
-  "Gems & Jewelry",
-  "Ceylon Tea & Beverages",
-  "Apparel & Textiles",
-  "Spices & Agriculture",
-  "Handicrafts & Arts",
-  "Coconut Products",
-  "Wood & Furniture",
-  "Seafood & Marine",
-  "Beauty & Personal Care",
-  "Building & Construction",
-  "Industrial Machinery",
-  "Gifts & Novelties",
-  "Electronics & Tech",
-  "Packaging & Printing",
-  "Health & Ayurveda",
+  { label: "Gems & Jewelry", slug: "gems-jewelry" },
+  { label: "Ceylon Tea & Beverages", slug: "ceylon-tea" },
+  { label: "Apparel & Textiles", slug: "apparel-textiles" },
+  { label: "Spices & Agriculture", slug: "spices-agriculture" },
+  { label: "Handicrafts & Arts", slug: "handicrafts-arts" },
+  { label: "Coconut Products", slug: "coconut-products" },
+  { label: "Wood & Furniture", slug: "wood-furniture" },
+  { label: "Seafood & Marine", slug: "seafood-marine" },
+  { label: "Beauty & Personal Care", slug: "beauty-care" },
+  { label: "Building & Construction", slug: "building-construction" },
+  { label: "Industrial Machinery", slug: "industrial-machinery" },
+  { label: "Gifts & Novelties", slug: "gifts-novelties" },
+  { label: "Electronics & Tech", slug: "electronics-tech" },
+  { label: "Packaging & Printing", slug: "packaging-printing" },
+  { label: "Health & Ayurveda", slug: "health-ayurveda" },
 ];
 
 export default function CategorySidebar() {
@@ -44,17 +45,19 @@ export default function CategorySidebar() {
 
       {/* Category list */}
       <ul>
-        {visible.map((label, i) => (
-          <li key={i}>
-            <button
+        {visible.map(({ label, slug }, i) => (
+          <li key={slug}>
+            <Link
+              href={`/categories/${slug}`}
               onMouseEnter={() => setHovered(i)}
               onMouseLeave={() => setHovered(null)}
-              className={`w-full text-left px-4 py-2 text-[13px] transition-colors
+              className={`block w-full text-left px-4 py-2 text-[13px] transition-colors
                           ${hovered === i
                             ? "bg-orange-50 text-[#E8820C]"
-                            : "text-gray-600 hover:text-[#E8820C]"}`}>
+                            : "text-gray-600 hover:text-[#E8820C]"}`}
+            >
               {label}
-            </button>
+            </Link>
           </li>
         ))}
       </ul>

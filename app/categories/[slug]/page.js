@@ -126,7 +126,7 @@ export default function CategoryPage() {
                 <span className="font-semibold capitalize">{category.name}</span>
               </p>
               <a
-                href="/register?role=seller"
+                href="/login?tab=register"
                 className="inline-block px-6 py-3 rounded-xl text-sm font-bold"
                 style={{ background: "#E8820C", color: "white" }}
               >

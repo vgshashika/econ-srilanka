@@ -5,6 +5,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 const SLIDES = [
   {
@@ -13,11 +14,12 @@ const SLIDES = [
     headline: "Sourcing Premium Ceylon Tea",
     sub:      "Connect with 200+ certified tea estates",
     cta:      "Explore Now",
+    href:     "/categories/ceylon-tea",
     products: [
-      { label: "BOP Grade Tea",    emoji: "🫖", bg: "bg-emerald-50"  },
-      { label: "Silver Tips Tea",  emoji: "🍃", bg: "bg-green-50"    },
-      { label: "Herbal Infusions", emoji: "🌿", bg: "bg-lime-50"     },
-      { label: "White Tea",        emoji: "☕", bg: "bg-gray-50"     },
+      { label: "BOP Grade Tea",    emoji: "🫖", bg: "bg-emerald-50", href: "/categories/ceylon-tea" },
+      { label: "Silver Tips Tea",  emoji: "🍃", bg: "bg-green-50",   href: "/categories/ceylon-tea" },
+      { label: "Herbal Infusions", emoji: "🌿", bg: "bg-lime-50",    href: "/products" },
+      { label: "White Tea",        emoji: "☕", bg: "bg-gray-50",    href: "/products" },
     ],
   },
   {
@@ -26,11 +28,12 @@ const SLIDES = [
     headline: "Blue Sapphires & Precious Gems",
     sub:      "GIA-certified stones from Ratnapura",
     cta:      "Browse Gems",
+    href:     "/categories/gems-jewelry",
     products: [
-      { label: "Blue Sapphire",   emoji: "💎", bg: "bg-blue-50"     },
-      { label: "Star Ruby",       emoji: "❤️",  bg: "bg-red-50"      },
-      { label: "Cat's Eye",       emoji: "👁️",  bg: "bg-yellow-50"   },
-      { label: "Moonstone",       emoji: "🔮", bg: "bg-slate-50"    },
+      { label: "Blue Sapphire",   emoji: "💎", bg: "bg-blue-50",   href: "/categories/gems-jewelry" },
+      { label: "Star Ruby",       emoji: "❤️",  bg: "bg-red-50",    href: "/categories/gems-jewelry" },
+      { label: "Cat's Eye",       emoji: "👁️",  bg: "bg-yellow-50", href: "/products" },
+      { label: "Moonstone",       emoji: "🔮", bg: "bg-slate-50",  href: "/products" },
     ],
   },
   {
@@ -39,11 +42,12 @@ const SLIDES = [
     headline: "Organic Spices & Herbs",
     sub:      "World's only true cinnamon — export certified",
     cta:      "View Spices",
+    href:     "/categories/spices-agriculture",
     products: [
-      { label: "True Cinnamon",  emoji: "🌿", bg: "bg-amber-50"    },
-      { label: "Black Pepper",   emoji: "⚫", bg: "bg-gray-100"    },
-      { label: "Cardamom",       emoji: "🌱", bg: "bg-green-50"    },
-      { label: "Cloves",         emoji: "🍀", bg: "bg-emerald-50"  },
+      { label: "True Cinnamon",  emoji: "🌿", bg: "bg-amber-50",  href: "/categories/spices-agriculture" },
+      { label: "Black Pepper",   emoji: "⚫", bg: "bg-gray-100",  href: "/categories/spices-agriculture" },
+      { label: "Cardamom",       emoji: "🌱", bg: "bg-green-50", href: "/products" },
+      { label: "Cloves",         emoji: "🍀", bg: "bg-emerald-50", href: "/products" },
     ],
   },
   {
@@ -52,11 +56,12 @@ const SLIDES = [
     headline: "Authentic Sri Lankan Textiles",
     sub:      "Artisan-crafted, export-ready fabrics",
     cta:      "Shop Textiles",
+    href:     "/categories/apparel-textiles",
     products: [
-      { label: "Batik Fabric",    emoji: "🧵", bg: "bg-purple-50"   },
-      { label: "Handloom Saree",  emoji: "👗", bg: "bg-pink-50"     },
-      { label: "Dumbara Weave",   emoji: "🎨", bg: "bg-fuchsia-50"  },
-      { label: "Tie-Dye Cotton",  emoji: "🌈", bg: "bg-indigo-50"   },
+      { label: "Batik Fabric",    emoji: "🧵", bg: "bg-purple-50", href: "/categories/apparel-textiles" },
+      { label: "Handloom Saree",  emoji: "👗", bg: "bg-pink-50",   href: "/categories/apparel-textiles" },
+      { label: "Dumbara Weave",   emoji: "🎨", bg: "bg-fuchsia-50", href: "/products" },
+      { label: "Tie-Dye Cotton",  emoji: "🌈", bg: "bg-indigo-50", href: "/products" },
     ],
   },
 ];
@@ -94,17 +99,18 @@ export default function HeroBanner() {
           {slide.headline}
         </h2>
         <p className="text-[13px] text-white/70 mb-5">{slide.sub}</p>
-        <button className="bg-white text-[#E8820C] hover:bg-gray-100
-                           px-5 py-2.5 rounded-full text-sm font-bold
-                           transition-colors shadow-lg">
+        <Link href={slide.href}
+          className="inline-flex items-center bg-white text-[#E8820C] hover:bg-gray-100
+                     px-5 py-2.5 rounded-full text-sm font-bold
+                     transition-colors shadow-lg">
           {slide.cta} →
-        </button>
+        </Link>
       </div>
 
       {/* ── Product image cards (floating at bottom, like reference) ── */}
       <div className="relative z-10 flex gap-3 px-8 pt-4 pb-6">
-        {slide.products.map(({ label, emoji, bg }) => (
-          <div key={label}
+        {slide.products.map(({ label, emoji, bg, href }) => (
+          <Link key={label} href={href}
             className={`${bg} rounded-xl shadow-md flex-1 flex flex-col
                          items-center justify-center py-5 cursor-pointer
                          hover:shadow-lg hover:-translate-y-1 transition-all`}>
@@ -112,7 +118,7 @@ export default function HeroBanner() {
             <span className="text-[11px] font-semibold text-gray-700 text-center px-2 leading-tight">
               {label}
             </span>
-          </div>
+          </Link>
         ))}
       </div>
 

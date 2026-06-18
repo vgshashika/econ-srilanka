@@ -3,12 +3,15 @@
 // Shows 4 B2B trust / USP cards in a row.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import Link from "next/link";
+
 const FEATURES = [
   {
     icon:     "🏭",
     title:    "10,000+ Verified Suppliers",
     body:     "Every supplier on Ecom.lk is rigorously verified for product quality, export capacity, and legal compliance.",
     cta:      "Find Suppliers",
+    href:     "/suppliers",
     border:   "border-t-blue-500",
     iconBg:   "bg-blue-50",
     ctaColor: "text-blue-600 hover:text-blue-700",
@@ -18,6 +21,7 @@ const FEATURES = [
     title:    "Trade Assurance",
     body:     "Your payment is held securely in escrow until you confirm goods are received and meet agreed specifications.",
     cta:      "Learn More",
+    href:     "/how-it-works",
     border:   "border-t-green-500",
     iconBg:   "bg-green-50",
     ctaColor: "text-green-600 hover:text-green-700",
@@ -27,6 +31,7 @@ const FEATURES = [
     title:    "Global Export Ready",
     body:     "All suppliers provide customs documentation, HS codes, and shipping to 120+ countries via major freight lines.",
     cta:      "Export Guide",
+    href:     "/products",
     border:   "border-t-purple-500",
     iconBg:   "bg-purple-50",
     ctaColor: "text-purple-600 hover:text-purple-700",
@@ -36,6 +41,7 @@ const FEATURES = [
     title:    "Dedicated Trade Support",
     body:     "Expert trade advisors are available Mon–Sat 8AM–6PM (Sri Lanka time) to assist with sourcing and negotiations.",
     cta:      "Contact Support",
+    href:     "/contact",
     border:   "border-t-[#E8820C]",
     iconBg:   "bg-orange-50",
     ctaColor: "text-[#E8820C] hover:text-[#d4740a]",
@@ -76,7 +82,7 @@ export default function FeatureCards() {
 
         {/* ── Feature cards grid ── */}
         <div className="grid grid-cols-4 gap-5">
-          {FEATURES.map(({ icon, title, body, cta, border, iconBg, ctaColor }) => (
+          {FEATURES.map(({ icon, title, body, cta, href, border, iconBg, ctaColor }) => (
             <div key={title}
               className={`bg-white rounded-xl p-6 border-t-4 ${border}
                           shadow-sm hover:shadow-md transition-shadow`}>
@@ -96,9 +102,9 @@ export default function FeatureCards() {
               <p className="text-[12px] text-gray-500 leading-relaxed mb-4">{body}</p>
 
               {/* CTA link */}
-              <a href="#" className={`${ctaColor} text-[12px] font-semibold transition-colors`}>
+              <Link href={href} className={`${ctaColor} text-[12px] font-semibold transition-colors`}>
                 {cta} →
-              </a>
+              </Link>
             </div>
           ))}
         </div>

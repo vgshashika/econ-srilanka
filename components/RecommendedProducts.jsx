@@ -239,7 +239,7 @@ export default function RecommendedProducts() {
             Curated from verified Sri Lankan exporters
           </span>
         </div>
-        <a href="#" className="text-[13px] text-[#E8820C] hover:text-[#d4740a] font-semibold">
+        <a href="/products" className="text-[13px] text-[#E8820C] hover:text-[#d4740a] font-semibold">
           View All Products →
         </a>
       </div>

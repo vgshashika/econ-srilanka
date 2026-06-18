@@ -280,7 +280,7 @@ export default function MegaMenu({ onMouseEnter, onMouseLeave }) {
           <span className="text-xl">{active.emoji}</span>
           <h3 className="text-sm font-bold text-gray-900">{active.label}</h3>
           <Link
-            href="#"
+            href="/products"
             className="ml-auto text-xs text-[#E8820C] hover:underline font-medium"
           >
             View all {active.label} →
@@ -294,7 +294,7 @@ export default function MegaMenu({ onMouseEnter, onMouseLeave }) {
               {col.map((item) => (
                 <li key={item}>
                   <Link
-                    href="#"
+                    href={`/search?q=${encodeURIComponent(item)}`}
                     className="text-[12px] text-gray-600 hover:text-[#E8820C]
                                hover:underline underline-offset-2 block py-0.5 transition-colors"
                   >
@@ -327,12 +327,13 @@ export default function MegaMenu({ onMouseEnter, onMouseLeave }) {
               </div>
             </div>
           </div>
-          <button
+          <Link
+            href="/rfq"
             className="bg-[#E8820C] hover:bg-[#d4740a] text-white text-[11px]
                          font-bold px-4 py-2 rounded-lg transition-colors flex-shrink-0"
           >
             {active.promo.cta} →
-          </button>
+          </Link>
         </div>
       </div>
     </div>

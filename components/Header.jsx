@@ -1,11 +1,14 @@
 "use client";
-// ─── Header Component (Milestone 02 redesign) ─────────────────────────────────
-// Reference layout: Made-in-China.com header
+// ─── Header Component ─────────────────────────────────────────────────────────
 // White background · pill-shaped search · camera icon · Post RFQ / icons right
+// Uses CartContext for live basket count · AuthContext for user state
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 
 const SEARCH_CATS = ["Products","Suppliers","Ceylon Tea","Gems & Jewelry",
   "Spices","Apparel","Handicrafts","Seafood"];
@@ -59,6 +62,25 @@ const Icon = {
 export default function Header() {
   const [query, setQuery]       = useState("");
   const [category, setCategory] = useState("Products");
+  const router = useRouter();
+  const { count: cartCount }    = useCart();
+  const { user, isLoggedIn, signOut } = useAuth();
+
+  function handleSearch(e) {
+    e.preventDefault();
+    const keyword = query.trim();
+    if (!keyword) return;
+    router.push(`/search?q=${encodeURIComponent(keyword)}&category=${encodeURIComponent(category)}`);
+  }
+
+  function focusSearch() {
+    const input = document.querySelector('input[placeholder="Enter a keyword to search products"]');
+    input?.focus();
+  }
+
+  function goTrending(term) {
+    router.push(`/search?q=${encodeURIComponent(term)}&category=${encodeURIComponent(category)}`);
+  }
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -78,7 +100,7 @@ export default function Header() {
 
         {/* ── Pill-shaped search bar ── */}
         <div className="flex-1 max-w-[600px]">
-          <div className="flex items-center border-2 border-[#E8820C] rounded-full
+          <form onSubmit={handleSearch} className="flex items-center border-2 border-[#E8820C] rounded-full
                           overflow-hidden focus-within:shadow-md
                           focus-within:shadow-orange-100 transition-shadow">
 
@@ -103,18 +125,24 @@ export default function Header() {
             />
 
             {/* Camera icon */}
-            <button className="px-3 text-gray-400 hover:text-[#E8820C]
-                               transition-colors flex-shrink-0 border-l border-gray-200">
+            <button
+              type="button"
+              onClick={focusSearch}
+              className="px-3 text-gray-400 hover:text-[#E8820C]
+                               transition-colors flex-shrink-0 border-l border-gray-200"
+            >
               {Icon.camera}
             </button>
 
             {/* Search button */}
-            <button className="bg-[#E8820C] hover:bg-[#d4740a] text-white w-12 h-full
+            <button
+              type="submit"
+              className="bg-[#E8820C] hover:bg-[#d4740a] text-white w-12 h-full
                                flex items-center justify-center flex-shrink-0
                                rounded-full -mr-0.5 transition-colors py-2.5">
               {Icon.search}
             </button>
-          </div>
+          </form>
 
           {/* Trending searches */}
           <div className="flex items-center gap-2 mt-1.5 px-4 text-[11px] text-gray-400">
@@ -132,7 +160,7 @@ export default function Header() {
         <div className="flex items-center gap-5 flex-shrink-0">
 
           {/* Post My RFQ – highlighted */}
-          <Link href="#"
+          <Link href="/rfq"
             className="flex flex-col items-center text-[#E8820C] hover:text-[#d4740a]
                        transition-colors cursor-pointer">
             {Icon.rfq}
@@ -140,29 +168,55 @@ export default function Header() {
           </Link>
 
           {/* Messages */}
-          <button className="flex flex-col items-center text-gray-600
+          <Link href="/dashboard"
+            className="flex flex-col items-center text-gray-600
                              hover:text-[#E8820C] transition-colors">
             {Icon.message}
             <span className="text-[11px] mt-0.5">Messages</span>
-          </button>
+          </Link>
 
           {/* Inquiry Basket */}
-          <button className="flex flex-col items-center text-gray-600
-                             hover:text-[#E8820C] transition-colors relative">
+          <Link href="/cart"
+            className="flex flex-col items-center text-gray-600
+                       hover:text-[#E8820C] transition-colors relative">
             {Icon.basket}
             <span className="text-[11px] mt-0.5 whitespace-nowrap">Inquiry Basket</span>
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px]
-                             rounded-full w-4 h-4 flex items-center justify-center font-bold">
-              0
-            </span>
-          </button>
+            {cartCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px]
+                               rounded-full w-4 h-4 flex items-center justify-center font-bold">
+                {cartCount > 9 ? "9+" : cartCount}
+              </span>
+            )}
+          </Link>
 
-          {/* Sign in */}
-          <button className="flex flex-col items-center text-gray-600
-                             hover:text-[#E8820C] transition-colors">
-            {Icon.person}
-            <span className="text-[11px] mt-0.5">Sign in</span>
-          </button>
+          {/* Sign in / User */}
+          {isLoggedIn ? (
+            <div className="relative group">
+              <button className="flex flex-col items-center text-[#E8820C] transition-colors">
+                {Icon.person}
+                <span className="text-[11px] mt-0.5 font-semibold max-w-[60px] truncate">
+                  {user?.firstName || user?.name || "Account"}
+                </span>
+              </button>
+              {/* Dropdown */}
+              <div className="absolute right-0 top-full mt-2 w-44 bg-white rounded-xl shadow-xl
+                              border border-gray-100 py-1 opacity-0 invisible
+                              group-hover:opacity-100 group-hover:visible transition-all z-50">
+                <Link href="/dashboard" className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">Dashboard</Link>
+                <Link href="/cart"      className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">Inquiry Basket</Link>
+                <hr className="my-1 border-gray-100"/>
+                <button onClick={signOut} className="block w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50">
+                  Sign Out
+                </button>
+              </div>
+            </div>
+          ) : (
+            <Link href="/login"
+              className="flex flex-col items-center text-gray-600 hover:text-[#E8820C] transition-colors">
+              {Icon.person}
+              <span className="text-[11px] mt-0.5">Sign in</span>
+            </Link>
+          )}
         </div>
       </div>
     </header>

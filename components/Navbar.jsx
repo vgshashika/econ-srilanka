@@ -9,13 +9,19 @@ import Link from "next/link";
 import MegaMenu from "./MegaMenu";
 
 const CENTER_LINKS = [
-  { label: "AI Sourcing",       href: "/ai-sourcing",     hot: true  },
-  { label: "Trade Assurance",   href: "/trade-assurance", hot: false },
-  { label: "Video Channel",     href: "/videos",          hot: false },
-  { label: "Top-ranked Exports",href: "/top-ranked",      hot: false },
+  { label: "AI Sourcing",       href: "/products",        hot: true  },
+  { label: "Trade Assurance",   href: "/how-it-works",    hot: false },
+  { label: "Video Channel",     href: "/trade-shows",     hot: false },
+  { label: "Top-ranked Exports",href: "/suppliers",       hot: false },
 ];
 
-const RIGHT_DROPDOWNS = ["Supplier","Buyer","Help","Apps","English"];
+const RIGHT_DROPDOWNS = [
+  { label: "Supplier", href: "/suppliers" },
+  { label: "Buyer", href: "/rfq" },
+  { label: "Help", href: "/faq" },
+  { label: "Apps", href: "/how-it-works" },
+  { label: "English", href: "/" },
+];
 
 function ChevronDown({ open }) {
   return (
@@ -83,14 +89,17 @@ export default function Navbar() {
 
           {/* ── Right dropdowns ── */}
           <div className="ml-auto flex items-center h-full">
-            {RIGHT_DROPDOWNS.map(label => (
-              <button key={label}
+            {RIGHT_DROPDOWNS.map(({ label, href }) => (
+              <Link
+                key={label}
+                href={href}
                 className="flex items-center gap-0.5 h-full px-3 text-[13px]
                            text-gray-600 hover:text-[#E8820C] transition-colors
-                           whitespace-nowrap border-l border-gray-100 first:border-0">
+                           whitespace-nowrap border-l border-gray-100 first:border-0"
+              >
                 {label}
                 <ChevronDown open={false}/>
-              </button>
+              </Link>
             ))}
           </div>
 
