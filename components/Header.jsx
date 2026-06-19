@@ -148,7 +148,10 @@ export default function Header() {
           <div className="flex items-center gap-2 mt-1.5 px-4 text-[11px] text-gray-400">
             <span>Trending:</span>
             {["Ceylon Tea","Blue Sapphire","Cinnamon","Batik","Coconut Oil"].map(t => (
-              <button key={t} type="button"
+              <button
+                key={t}
+                type="button"
+                onClick={() => goTrending(t)}
                 className="hover:text-[#E8820C] hover:underline underline-offset-2 transition-colors">
                 {t}
               </button>

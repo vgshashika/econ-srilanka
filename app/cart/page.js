@@ -5,14 +5,7 @@ import Header from "@/components/Header";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Breadcrumb from "@/components/Breadcrumb";
-import { PRODUCTS } from "@/lib/data";
-
-// ─── Mock: pre-fill basket with 3 products (replace with localStorage/context) ─
-const INIT_BASKET = [
-  { ...PRODUCTS[0], qty: 100, unit: "kg",    note: "" },
-  { ...PRODUCTS[1], qty: 5,   unit: "carat", note: "" },
-  { ...PRODUCTS[3], qty: 50,  unit: "kg",    note: "" },
-];
+import { useCart } from "@/context/CartContext";
 
 const STATUS_COLORS = {
   "Top Supplier": { bg: "#FFF3E0", color: "#E8820C" },
@@ -30,10 +23,10 @@ function TrashIcon() {
 }
 
 export default function CartPage() {
-  const [items,   setItems]   = useState(INIT_BASKET);
-  const [step,    setStep]    = useState("basket");   // "basket" | "inquiry" | "sent"
+  const { items, removeItem, updateQty, updateNote, clearCart } = useCart();
+  const [step, setStep] = useState("basket");   // "basket" | "inquiry" | "sent"
   const [loading, setLoading] = useState(false);
-  const [form,    setForm]    = useState({
+  const [form, setForm] = useState({
     name: "", company: "", email: "", phone: "",
     country: "Sri Lanka", message: "",
   });
@@ -42,18 +35,10 @@ export default function CartPage() {
   /* ── helpers ── */
   function setF(k, v) { setForm(f => ({ ...f, [k]: v })); }
 
-  function updateQty(id, val) {
+  function handleUpdateQty(id, val) {
     const n = parseInt(val, 10);
     if (isNaN(n) || n < 1) return;
-    setItems(prev => prev.map(i => i.id === id ? { ...i, qty: n } : i));
-  }
-
-  function updateNote(id, val) {
-    setItems(prev => prev.map(i => i.id === id ? { ...i, note: val } : i));
-  }
-
-  function removeItem(id) {
-    setItems(prev => prev.filter(i => i.id !== id));
+    updateQty(id, n);
   }
 
   function validate() {
@@ -208,7 +193,7 @@ export default function CartPage() {
                     <span className="font-bold text-gray-800">
                       {items.length} Product{items.length > 1 ? "s" : ""} in Basket
                     </span>
-                    <button onClick={() => setItems([])}
+                    <button onClick={() => clearCart()}
                       className="text-xs text-red-400 hover:text-red-600 transition-colors">
                       Clear All
                     </button>
@@ -268,18 +253,18 @@ export default function CartPage() {
                             <label className="text-[11px] text-gray-500 font-medium">Qty:</label>
                             <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
                               <button
-                                onClick={() => updateQty(item.id, item.qty - 1)}
+                                onClick={() => handleUpdateQty(item.id, item.qty - 1)}
                                 className="w-7 h-7 flex items-center justify-center text-gray-500
                                            hover:bg-gray-100 transition-colors font-bold text-sm">
                                 –
                               </button>
                               <input
                                 type="number" min="1" value={item.qty}
-                                onChange={e => updateQty(item.id, e.target.value)}
+                                onChange={e => handleUpdateQty(item.id, e.target.value)}
                                 className="w-14 text-center text-sm font-semibold border-x border-gray-200
                                            py-1 focus:outline-none"/>
                               <button
-                                onClick={() => updateQty(item.id, item.qty + 1)}
+                                onClick={() => handleUpdateQty(item.id, item.qty + 1)}
                                 className="w-7 h-7 flex items-center justify-center text-gray-500
                                            hover:bg-gray-100 transition-colors font-bold text-sm">
                                 +

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { Suspense, useState, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import Header from "@/components/Header";
 import Navbar from "@/components/Navbar";
@@ -13,7 +13,7 @@ import { PRODUCTS, SUPPLIERS } from "@/lib/data";
 
 const PER_PAGE = 8;
 
-export default function SearchPage() {
+function SearchContent() {
   const searchParams    = useSearchParams();
   const q               = searchParams.get("q") || "";
   const [tab, setTab]   = useState("products");   // "products" | "suppliers"
@@ -198,5 +198,13 @@ export default function SearchPage() {
       <Footer />
       {inquiry && <InquiryModal product={inquiry} onClose={() => setInquiry(null)} />}
     </>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading…</div>}>
+      <SearchContent />
+    </Suspense>
   );
 }

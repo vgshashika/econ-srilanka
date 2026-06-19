@@ -44,7 +44,7 @@ export default function Footer() {
   const [subscribed, setSubscribed] = useState(false);
   const [error, setError] = useState("");
 
-  function handleSubscribe(e) {
+  async function handleSubscribe(e) {
     e.preventDefault();
     const trimmed = email.trim();
     const isValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed);
@@ -55,8 +55,14 @@ export default function Footer() {
     }
 
     setError("");
-    setSubscribed(true);
-    setEmail("");
+    try {
+      // Stubbed for now until backend endpoint is ready.
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      setSubscribed(true);
+      setEmail("");
+    } catch {
+      setError("Something went wrong. Please try again.");
+    }
   }
 
   return (

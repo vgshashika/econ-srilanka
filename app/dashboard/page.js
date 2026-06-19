@@ -1,11 +1,12 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/context/AuthContext";
+import { PRODUCTS } from "@/lib/data";
 
 const NAV_ITEMS = [
   { key: "overview",   label: "Overview",          icon: "📊" },
@@ -39,11 +40,28 @@ const STATUS_COLORS = {
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("overview");
-  const { user, signOut }         = useAuth();
-  const router                    = useRouter();
+  const [wishlistIds, setWishlistIds] = useState([]);
+  const { user, signOut } = useAuth();
+  const router = useRouter();
   const displayName = user?.firstName || user?.name || "there";
+  const userRole = user?.role || "Buyer";
+  const userCity = user?.city || user?.location || "Colombo";
+  const userInitial = (user?.firstName || user?.name || "A").charAt(0).toUpperCase();
+
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("ecom_wishlist") || "[]");
+      setWishlistIds(Array.isArray(stored) ? stored : []);
+    } catch {}
+  }, []);
+
+  const wishlistProducts = useMemo(
+    () => PRODUCTS.filter((p) => wishlistIds.includes(p.id)),
+    [wishlistIds]
+  );
 
   function handleSignOut() { signOut(); router.push("/"); }
+  function handleViewRFQ(id) { router.push(`/rfq/${id}`); }
 
   const unreadCount = MOCK_INQUIRIES.filter((i) => i.unread).length;
 
@@ -86,11 +104,11 @@ export default function DashboardPage() {
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white font-black text-lg"
                     style={{ background: "#E8820C" }}
                   >
-                    J
+                    {userInitial}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-sm font-bold truncate" style={{ color: "#0C1E35" }}>{user?.name || "My Account"}</p>
-                    <p className="text-xs text-gray-400 truncate">Buyer · Colombo</p>
+                    <p className="text-sm font-bold truncate" style={{ color: "#0C1E35" }}>{user?.name || user?.firstName || "My Account"}</p>
+                    <p className="text-xs text-gray-400 truncate">{userRole} · {userCity}</p>
                   </div>
                 </div>
 
@@ -246,7 +264,9 @@ export default function DashboardPage() {
                                 style={STATUS_COLORS[rfq.status]}>{rfq.status}</span>
                             </td>
                             <td className="px-4 py-4">
-                              <button className="text-xs font-semibold" style={{ color: "#E8820C" }}>
+                              <button
+                                onClick={() => handleViewRFQ(rfq.id)}
+                                className="text-xs font-semibold" style={{ color: "#E8820C" }}>
                                 View →
                               </button>
                             </td>
@@ -287,16 +307,31 @@ export default function DashboardPage() {
 
               {/* Wishlist tab */}
               {activeTab === "wishlist" && (
-                <div className="text-center py-20">
-                  <div className="text-5xl mb-4">❤️</div>
-                  <h3 className="text-lg font-bold mb-2" style={{ color: "#0C1E35" }}>Your Saved Products</h3>
-                  <p className="text-sm text-gray-500 mb-5">Start saving products from the marketplace</p>
-                  <Link href="/products"
-                    className="inline-block px-6 py-3 rounded-xl text-sm font-bold"
-                    style={{ background: "#E8820C", color: "white" }}>
-                    Browse Products
-                  </Link>
-                </div>
+                wishlistProducts.length === 0 ? (
+                  <div className="text-center py-20">
+                    <div className="text-5xl mb-4">❤️</div>
+                    <h3 className="text-lg font-bold mb-2" style={{ color: "#0C1E35" }}>Your Saved Products</h3>
+                    <p className="text-sm text-gray-500 mb-5">Start saving products from the marketplace</p>
+                    <Link href="/products"
+                      className="inline-block px-6 py-3 rounded-xl text-sm font-bold"
+                      style={{ background: "#E8820C", color: "white" }}>
+                      Browse Products
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                    {wishlistProducts.map((p) => (
+                      <div key={p.id} className="bg-white rounded-2xl p-5" style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+                        <p className="text-xs text-gray-500">{p.category}</p>
+                        <h4 className="font-bold mt-1" style={{ color: "#0C1E35" }}>{p.name}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{p.price} {p.unit}</p>
+                        <Link href={`/products/${p.id}`} className="inline-block mt-3 text-sm font-semibold" style={{ color: "#E8820C" }}>
+                          View Product →
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                )
               )}
 
               {/* Profile tab */}
@@ -305,16 +340,16 @@ export default function DashboardPage() {
                   <h3 className="text-lg font-black mb-6" style={{ color: "#0C1E35" }}>Profile Settings</h3>
                   <div className="space-y-5 max-w-lg">
                     {[
-                      { label: "First Name", value: "John", type: "text" },
-                      { label: "Last Name",  value: "Silva", type: "text" },
-                      { label: "Email",      value: "john.silva@example.com", type: "email" },
-                      { label: "Company",    value: "Global Imports Ltd.", type: "text" },
-                      { label: "Phone",      value: "+1 555 123 4567", type: "tel" },
-                      { label: "Country",    value: "United States", type: "text" },
+                      { label: "First Name", value: user?.firstName || "", type: "text" },
+                      { label: "Last Name",  value: user?.lastName || user?.name?.split(" ").slice(1).join(" ") || "", type: "text" },
+                      { label: "Email",      value: user?.email || "", type: "email" },
+                      { label: "Company",    value: user?.company || "", type: "text" },
+                      { label: "Phone",      value: user?.phone || "", type: "tel" },
+                      { label: "Country",    value: user?.country || user?.city || "", type: "text" },
                     ].map((f) => (
                       <div key={f.label}>
                         <label className="block text-xs font-semibold mb-1.5 text-gray-700">{f.label}</label>
-                        <input type={f.type} defaultValue={f.value}
+                        <input type={f.type} value={f.value}
                           className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-orange-400"/>
                       </div>
                     ))}

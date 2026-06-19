@@ -1,19 +1,22 @@
 "use client";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
-export default function LoginPage() {
+function LoginContent() {
   const router       = useRouter();
   const searchParams = useSearchParams();
   const { signIn }   = useAuth();
   const defaultTab   = searchParams.get("tab") === "register" ? "register" : "login";
 
   const [tab, setTab]       = useState(defaultTab);
-  const [role, setRole]     = useState("buyer");    // "buyer" | "seller"
+  const [role, setRole]     = useState("buyer");
   const [loading, setLoading] = useState(false);
   const [error, setError]   = useState("");
+  const [attempts, setAttempts] = useState(0);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   /* ── Login state ── */
   const [login, setLogin] = useState({ email: "", password: "", remember: false });
@@ -33,8 +36,6 @@ export default function LoginPage() {
     e.preventDefault();
     setError(""); setLoading(true);
     try {
-      // TODO (Laravel): const data = await login(loginForm);
-      // For now: mock a successful login with demo user
       await new Promise((r) => setTimeout(r, 800));
       signIn(
         "demo_token_123",
@@ -50,28 +51,42 @@ export default function LoginPage() {
       const redirect = searchParams.get("redirect") || "/dashboard";
       router.push(redirect);
     } catch {
-      setError("Invalid email or password. Please try again.");
+      const nextAttempts = attempts + 1;
+      setAttempts(nextAttempts);
+      if (nextAttempts >= 5) {
+        setError("Too many failed attempts. Please wait 30 seconds.");
+      } else {
+        setError("Invalid email or password. Please try again.");
+      }
     } finally { setLoading(false); }
   }
 
   async function handleRegister(e) {
     e.preventDefault();
     setError("");
+    if (reg.password.length < 8) {
+      return setError("Password must be at least 8 characters.");
+    }
+    if (!/[A-Z]/.test(reg.password) || !/[0-9]/.test(reg.password)) {
+      return setError("Password must include at least one uppercase letter and one number.");
+    }
     if (reg.password !== reg.confirmPassword) {
       return setError("Passwords do not match.");
     }
     setLoading(true);
     try {
-      // TODO (Laravel): const data = await register({ ...reg, role });
       await new Promise((r) => setTimeout(r, 900));
       signIn(
         "demo_token_123",
         {
           name: `${reg.firstName} ${reg.lastName}`,
           firstName: reg.firstName,
+          lastName: reg.lastName,
           email: reg.email,
           role,
           company: reg.company,
+          phone: reg.phone,
+          country: reg.country,
         },
         login.remember
       );
@@ -156,13 +171,23 @@ export default function LoginPage() {
                           Forgot password?
                         </Link>
                       </div>
-                      <input
-                        type="password" required
-                        placeholder="••••••••"
-                        value={login.password}
-                        onChange={(e) => setL("password", e.target.value)}
-                        className={inputCls}
-                      />
+                      <div className="relative">
+                        <input
+                          type={showPassword ? "text" : "password"} required
+                          placeholder="••••••••"
+                          value={login.password}
+                          onChange={(e) => setL("password", e.target.value)}
+                          className={`${inputCls} pr-12`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((v) => !v)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold"
+                          style={{ color: "#E8820C" }}
+                        >
+                          {showPassword ? "Hide" : "Show"}
+                        </button>
+                      </div>
                     </div>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -190,13 +215,20 @@ export default function LoginPage() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-3">
-                    {["🔵 Google", "🔷 LinkedIn"].map((s) => (
-                      <button key={s}
-                        className="py-2.5 rounded-xl text-sm font-medium border border-gray-200 hover:bg-gray-50 transition-colors"
-                        style={{ color: "#374151" }}>
-                        {s}
-                      </button>
-                    ))}
+                    <button
+                      type="button"
+                      disabled
+                      className="py-2.5 rounded-xl text-sm font-medium border border-gray-200 text-gray-400 cursor-not-allowed"
+                    >
+                      🔵 Google (coming soon)
+                    </button>
+                    <button
+                      type="button"
+                      disabled
+                      className="py-2.5 rounded-xl text-sm font-medium border border-gray-200 text-gray-400 cursor-not-allowed"
+                    >
+                      🔷 LinkedIn (coming soon)
+                    </button>
                   </div>
 
                   <p className="text-center text-sm text-gray-500 mt-6">
@@ -270,13 +302,33 @@ export default function LoginPage() {
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="block text-xs font-semibold mb-1" style={{ color: "#374151" }}>Password *</label>
-                        <input type="password" required placeholder="Min 8 chars" value={reg.password}
-                          onChange={(e) => setR("password", e.target.value)} className={inputCls}/>
+                        <div className="relative">
+                          <input type={showPassword ? "text" : "password"} required placeholder="Min 8 chars" value={reg.password}
+                            onChange={(e) => setR("password", e.target.value)} className={`${inputCls} pr-12`}/>
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword((v) => !v)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold"
+                            style={{ color: "#E8820C" }}
+                          >
+                            {showPassword ? "Hide" : "Show"}
+                          </button>
+                        </div>
                       </div>
                       <div>
                         <label className="block text-xs font-semibold mb-1" style={{ color: "#374151" }}>Confirm *</label>
-                        <input type="password" required placeholder="Repeat" value={reg.confirmPassword}
-                          onChange={(e) => setR("confirmPassword", e.target.value)} className={inputCls}/>
+                        <div className="relative">
+                          <input type={showConfirm ? "text" : "password"} required placeholder="Repeat" value={reg.confirmPassword}
+                            onChange={(e) => setR("confirmPassword", e.target.value)} className={`${inputCls} pr-12`}/>
+                          <button
+                            type="button"
+                            onClick={() => setShowConfirm((v) => !v)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold"
+                            style={{ color: "#E8820C" }}
+                          >
+                            {showConfirm ? "Hide" : "Show"}
+                          </button>
+                        </div>
                       </div>
                     </div>
 
@@ -319,5 +371,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading…</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }
